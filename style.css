@@ -1,0 +1,1190 @@
+/* ========================================== 
+   1. RESET & BASE (ESTILOS GLOBALES)
+   ========================================== 
+*/
+
+/* Reset preventivo y box-sizing heredado */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  /* La metodología de Jon recomienda manejar el font-size base aquí si usas rems */
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family:
+    "Segoe UI",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background-color: var(--bg);
+  color: var(--txt);
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Multimedia flexible */
+img,
+picture,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Reseteo de elementos de formulario para consistencia */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Tipografía balanceada */
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ========================================== 
+   2. TOKENS (VARIABLES / CUSTOM PROPERTIES)
+   ========================================== 
+*/
+
+:root {
+  /* Breakpoints (Metodología Mobile First) */
+  --bp-md: 37.5em; /* 600px */
+  --bp-lg: 62em; /* 992px */
+  --bp-xl: 75em; /* 1200px */
+
+  /* Tipografía Fluid (clamp) */
+  --step--2: clamp(0.7rem, calc(0.87rem + -0.14vw), 0.84rem);
+  --step--1: clamp(0.94rem, calc(0.95rem + -0.01vw), 0.94rem);
+  --step-0: clamp(1.06rem, calc(1.03rem + 0.19vw), 1.25rem);
+  --step-1: clamp(1.2rem, calc(1.1rem + 0.47vw), 1.67rem);
+  --step-2: clamp(1.35rem, calc(1.17rem + 0.88vw), 2.22rem);
+  --step-3: clamp(1.51rem, calc(1.22rem + 1.45vw), 2.96rem);
+
+  /* Espaciado Fluid */
+  --space-xs: clamp(0.5rem, 2vw, 0.75rem);
+  --space-sm: clamp(0.75rem, 2.5vw, 1rem);
+  --space-md: clamp(1rem, 3vw, 1.5rem);
+  --space-lg: clamp(1.5rem, 4vw, 2rem);
+  --space-xl: clamp(2rem, 5vw, 3rem);
+
+  /* Colores Estáticos */
+  --primary: #00a1e4;
+  --primary-dark: #0080b3;
+  --primary-light: #00d4ff;
+  --dark: #0b0e11;
+  --light: #f8f9fa;
+
+  /* Variables Dinámicas (Tema Dark por defecto) */
+  --bg: var(--dark);
+  --txt: #ffffff;
+  --txt-secondary: #b0b0b0;
+  --glass: rgba(255, 255, 255, 0.05);
+  --shadow-primary: rgba(0, 161, 228, 0.3);
+  --border-color: rgba(0, 161, 228, 0.2);
+}
+
+/* Switcher de tema vía atributo */
+[data-theme="light"] {
+  --bg: var(--light);
+  --txt: #1a1a1a;
+  --txt-secondary: #555555;
+  --glass: rgba(0, 0, 0, 0.05);
+  --shadow-primary: rgba(0, 161, 228, 0.15);
+  --border-color: rgba(0, 161, 228, 0.15);
+}
+
+/* ========================================== 
+   3. PREFERENCIAS & ACCESIBILIDAD
+   ========================================== 
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
+  }
+}
+
+/* ========================================== 
+   4. COMPONENTES COMUNES (BOTONES FIJOS)
+   ========================================== 
+*/
+
+.btn-floating {
+  position: fixed;
+  z-index: 5000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: clamp(40px, 10vw, 50px);
+  height: clamp(40px, 10vw, 50px);
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 15px var(--shadow-primary);
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.btn-floating:hover {
+  transform: scale(1.1);
+  background-color: var(--primary-light);
+}
+
+#theme-toggle {
+  top: var(--space-md);
+  right: var(--space-md);
+}
+
+.cerrar-modal {
+  /* Se sobreescribe posición para que sea relativa al modal padre */
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+}
+/* ==========================================
+   4. PRELOADER, HEADER Y BOTONES FLOTANTES
+   ========================================== */
+
+/* --- Preloader --- */
+#preloader-art {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeOut 0.5s ease-out 2.5s forwards;
+  pointer-events: none;
+  /* Transición para el desvanecimiento suave desde JS */
+  transition: opacity 0.5s ease;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.preloader-content {
+  /* Cambio clave: Usamos flex para centrar todo el bloque de contenido */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: min(90%, 400px); /* Más flexible en móviles */
+}
+
+#img-preloader {
+  /* Tamaño controlado para que no se desborde */
+  width: clamp(120px, 30vw, 180px);
+  height: auto;
+  /* Centrado automático y espacio inferior */
+  margin: 0 auto var(--space-lg) auto;
+  display: block;
+  filter: drop-shadow(0 0 10px var(--primary));
+  animation: pulse-scale 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-scale {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.loader-track {
+  width: 100%;
+  height: 4px;
+  background: #222;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: var(--space-md);
+}
+
+.loader-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  animation: load 2.5s ease-in-out forwards;
+}
+
+@keyframes load {
+  to {
+    width: 100%;
+  }
+}
+
+/* --- Header --- */
+header {
+  height: clamp(50vh, 70vh, 60vh);
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  width: 100%;
+}
+
+header::before,
+header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("img/logo.jpeg") center;
+}
+
+header::before {
+  background-size: cover;
+  filter: blur(25px) brightness(0.4);
+  z-index: 1;
+}
+
+header::after {
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: 2;
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+}
+
+/* --- Botón Dark Mode --- */
+#theme-toggle {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 10001; /* Siempre por encima del preloader */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px var(--shadow-primary);
+  cursor: pointer;
+  border: none;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
+}
+
+#theme-toggle:hover {
+  transform: scale(1.1);
+  background: var(--primary-light);
+}
+
+/* --- Reset de Enlaces (Elimina el azul de navegador) --- */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* --- Fix de Emojis para Gradientes --- */
+.emoji-fix,
+.descripcion-viva span,
+#desc-texto span {
+  -webkit-text-fill-color: initial;
+  background: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+/* ==========================================
+   5. BARRA DE CONTACTO Y MENÚ - FIX SIN BLOQUEO
+   ========================================== */
+
+.contact-bar {
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 12px 20px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px var(--shadow-dark);
+  width: 95%;
+  max-width: fit-content;
+  margin: 0 auto;
+  position: relative; /* Importante para los hijos */
+  z-index: 1000;
+}
+
+.nav-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 18px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Dropdown para Escritorio (Default) */
+.dropdown-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(11, 14, 17, 0.98);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 10px;
+  min-width: 280px;
+  z-index: 3000;
+  transition: all 0.3s ease;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Solo en pantallas grandes activamos el hover */
+@media (min-width: 37.5em) {
+  .nav-item:hover .dropdown-content {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(15px);
+  }
+}
+
+/* --- AJUSTE ESPECÍFICO PARA MÓVIL (Acordeón) --- */
+@media (max-width: 37.5em) {
+  .contact-bar {
+    max-width: 98%;
+  }
+
+  .nav-menu {
+    flex-direction: column; /* Alineamos vertical */
+    width: 100%;
+  }
+
+  .dropdown-content {
+    /* RESET DE POSICIÓN: Ahora empuja el contenido */
+    position: relative;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    left: 0;
+    top: 0;
+    display: none; /* Se abrirá con la clase .active */
+    width: 100%;
+    max-width: 100%;
+    margin-top: 10px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+  }
+
+  /* Clase que pondremos con JS para abrir */
+  .nav-item.active .dropdown-content {
+    display: block;
+  }
+
+  .nav-item.active .mini-icon {
+    transform: rotate(180deg);
+  }
+}
+/* ==========================================
+   6. SECCIÓN DE TYPING
+   ========================================== */
+
+.typing-section {
+  padding: clamp(30px, 5vw, 50px) var(--space-md);
+  text-align: center;
+}
+
+#titulo-escrito {
+  font-size: var(--step-3);
+  min-height: 1.5em;
+  color: var(--txt);
+  font-weight: 700;
+}
+
+#titulo-escrito::after {
+  content: "|";
+  margin-left: 5px;
+  color: var(--primary);
+  animation: parpadeo 0.8s infinite;
+}
+
+@keyframes parpadeo {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ==========================================
+   7. SECCIÓN BIO
+   ========================================== */
+
+.bio-section {
+  padding: var(--space-2xl) var(--space-md);
+  text-align: center;
+}
+
+.bio-badge {
+  display: inline-block;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: clamp(5px, 1vw, 8px) clamp(12px, 2vw, 18px);
+  border-radius: 20px;
+  margin-bottom: var(--space-lg);
+  font-weight: 600;
+  font-size: var(--step--1);
+  background: var(--glass);
+  transition: all 0.3s ease;
+}
+
+.bio-badge:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.05);
+}
+
+.bio-description {
+  font-size: var(--step-0);
+  line-height: 1.8;
+  max-width: 650px;
+  margin: 0 auto;
+  color: var(--txt-secondary);
+}
+
+.visitanos-text {
+  display: block;
+  margin-top: var(--space-lg);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: var(--step-0);
+}
+
+.bio-footer .line {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 10px;
+  margin: var(--space-md) auto;
+}
+
+/* ==========================================
+   8. FILTROS Y GRID - OPTIMIZADO
+   ========================================== */
+
+.category-filter-section {
+  margin: var(--space-xl) 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px; /* Espaciado más controlado */
+  padding: 0 var(--space-md);
+  position: relative;
+  z-index: 10;
+}
+
+.filter-btn {
+  padding: clamp(10px, 2vw, 14px) clamp(20px, 3vw, 30px);
+  /* Borde sutil que resalta en modo oscuro */
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: var(--txt); /* Texto principal (blanco en dark mode) */
+  background: rgba(255, 255, 255, 0.03); /* Fondo casi invisible */
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: clamp(0.85rem, 2vw, 0.9rem);
+  letter-spacing: 0.5px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  text-decoration: none; /* Asegura que no parezca link */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+/* Efecto al pasar el mouse (Hover) */
+.filter-btn:hover {
+  border-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-3px);
+  background: rgba(var(--primary-rgb), 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Botón Activo (Categoría seleccionada) */
+.filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff; /* Blanco puro obligatorio */
+  box-shadow: 0 0 25px var(--shadow-primary);
+  transform: scale(1.05);
+}
+
+/* Grid de Productos - Estructura Base */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  padding: var(--space-md);
+  max-width: 1400px;
+  margin: 0 auto;
+  /* Transición suave para cuando aparecen/desaparecen items */
+  transition: all 0.5s ease-in-out;
+}
+
+/* Ajustes para móviles pequeños */
+@media (max-width: 480px) {
+  .category-filter-section {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    width: 48%; /* Dos botones por fila en móviles muy chicos */
+    padding: 10px;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+}
+
+/* ==========================================
+   9. GRID CONTAINER - ANTI-SCROLL FINAL
+   ========================================== */
+
+.grid-container {
+  display: grid;
+  /* Forzamos 2 columnas exactas en móviles para que no haya desbordamiento */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; /* Gap controlado para pantallas pequeñas */
+  width: 100%; /* Ocupa el ancho total disponible */
+  max-width: 100vw; /* Pero nunca más que la pantalla */
+  margin: var(--space-xl) auto;
+  padding: 0 10px; /* Padding fijo para evitar empuje de píxeles fluidos */
+  overflow: hidden; /* Seguridad: nada sale de aquí */
+}
+
+/* --- Breakpoints adaptativos --- */
+
+/* TABLET (600px+) */
+@media (min-width: 37.5em) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-md);
+    padding: 0 var(--space-md);
+    width: 95%;
+  }
+}
+
+/* DESKTOP (992px+) */
+@media (min-width: 62em) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr); /* 4 fijas para estabilidad */
+    gap: var(--space-lg);
+  }
+}
+
+/* LARGE DESKTOP (1200px+) */
+@media (min-width: 75em) {
+  .grid-container {
+    grid-template-columns: repeat(6, 1fr);
+    max-width: 1440px;
+  }
+}
+
+/* EXTRA LARGE (1408px+) */
+@media (min-width: 88em) {
+  .grid-container {
+    grid-template-columns: repeat(8, 1fr);
+    max-width: 1800px;
+  }
+}
+
+/* ==========================================
+   10. CARDS
+   ========================================== */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: var(--space-sm);
+  background-color: var(--glass);
+  opacity: 0;
+  transition:
+    opacity 0.6s ease-in-out,
+    transform 0.5s ease;
+  will-change: opacity, transform;
+}
+
+.card img.loaded {
+  opacity: 1;
+}
+
+.card img:not(.loaded) {
+  animation: pulse-card 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-card {
+  0%,
+  100% {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ==========================================
+   11. DESCRIPCIÓN VIVA - EFECTO GRADIENTE
+   ========================================== */
+
+.descripcion-viva,
+#desc-texto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  /* Espaciado y bordes responsive */
+  padding: clamp(8px, 2vw, 12px) clamp(12px, 2vw, 18px);
+  border-radius: 12px;
+  border: 1px solid var(--primary);
+
+  /* Tipografía */
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(0.65rem, 2vw, 0.85rem);
+
+  /* Efecto Glassmorphism */
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* Efecto de Texto Gradiente */
+  background-image: linear-gradient(90deg, #00a1e4, #00ffcc, #ff007a, #00a1e4);
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Animaciones */
+  animation:
+    brilloTexto 4s linear infinite,
+    aparecerYVibrar 0.8s ease-out;
+}
+
+/* Ajuste específico para las Cards */
+.card .descripcion-viva {
+  min-height: 42px;
+  width: 90%;
+  margin-top: var(--space-sm);
+}
+
+/* Ajuste específico para el Modal (Texto más grande) */
+#desc-texto {
+  font-size: var(--step-1);
+  padding: var(--space-md) var(--space-lg);
+  max-width: 85%;
+  border-width: 2px;
+}
+
+/* FIX DE EMOJIS: Limpio y sin !important */
+.descripcion-viva .emoji-fix,
+#desc-texto .emoji-fix {
+  /* Al ser descendiente directo, estas reglas ganan prioridad */
+  -webkit-text-fill-color: initial;
+  background-image: none;
+  background-clip: border-box;
+  -webkit-background-clip: border-box;
+  display: inline-block;
+  margin: 0 4px; /* Espacio sutil a los lados del emoji */
+  vertical-align: middle;
+}
+
+/* KEYFRAMES */
+@keyframes brilloTexto {
+  to {
+    background-position: 300% center;
+  }
+}
+
+@keyframes aparecerYVibrar {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* ==========================================
+   12. MODAL
+   ========================================== */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 20000;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-md);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-img {
+  max-width: min(90%, 600px);
+  max-height: 65vh;
+  border-radius: 12px;
+  margin-bottom: var(--space-lg);
+  object-fit: contain;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+/* ==========================================
+   13. SECCIÓN HORARIOS
+   ========================================== */
+
+.horarios-section {
+  padding: var(--space-2xl) var(--space-md);
+  background: var(--glass);
+}
+
+.horarios-container {
+  max-width: 450px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.dia {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  font-size: var(--step-0);
+}
+
+.dia strong.cerrado {
+  color: #ff4757;
+  font-weight: 700;
+}
+
+.dia:last-child {
+  border-bottom: none;
+}
+
+/* ==========================================
+   14. FOOTER Y EFECTOS
+   ========================================== */
+
+.footer-custom {
+  padding: var(--space-2xl) var(--space-md);
+  text-align: center;
+  background: var(--glass);
+  border-top: 1px solid var(--border-color);
+}
+
+.shimmer-text {
+  display: inline-block;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    var(--primary-light),
+    var(--primary)
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+  font-weight: 700;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.img-container {
+  position: relative;
+  width: 100%;
+  height: clamp(200px, 50vw, 300px);
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: var(--space-lg);
+}
+
+.img-main,
+.img-hover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    opacity 0.4s ease,
+    transform 0.6s ease;
+}
+
+.img-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.img-container.has-hover:hover .img-main {
+  opacity: 0;
+}
+
+.img-container.has-hover:hover .img-hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ==========================================
+   15. SCROLLBAR PERSONALIZADO
+   ========================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+  border-radius: 10px;
+  border: 3px solid var(--bg);
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}
+
+::selection {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* ==========================================
+   16. UTILIDADES Y HELPERS
+   ========================================== */
+
+.container {
+  width: 100%; /* Cambiado de 95% para mejor control */
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-secondary {
+  color: var(--txt-secondary);
+}
+
+.mt-lg {
+  margin-top: var(--space-lg);
+}
+
+.mb-lg {
+  margin-bottom: var(--space-lg);
+}
+
+.py-lg {
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-lg);
+}
+/* ==========================================
+   17. MEDIA QUERIES ADICIONALES (RESPONSIVE)
+   ========================================== */
+
+/* 1. MÓVILES MUY PEQUEÑOS (iPhone SE, etc.) */
+@media (max-width: 25em) {
+  .contact-bar {
+    padding: 12px 8px;
+    width: 98%;
+  }
+
+  .nav-menu {
+    gap: 8px 10px; /* Espaciado ajustado para 2 o 3 filas */
+  }
+
+  .cta-link {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+  }
+}
+
+/* 2. TABLET PEQUEÑA (600px+) */
+@media (min-width: 37.5em) {
+  .contact-bar {
+    padding: 10px 25px;
+    border-radius: 50px; /* Volvemos al diseño de cápsula */
+  }
+
+  .nav-menu {
+    gap: var(--space-md);
+    flex-wrap: nowrap; /* Intentamos mantener una sola línea desde aquí */
+  }
+
+  .bio-description {
+    font-size: var(--step-1);
+  }
+}
+
+/* 3. TABLET GRANDE / LAPTOP (768px+) */
+@media (min-width: 48em) {
+  .nav-menu {
+    gap: var(--space-lg);
+  }
+
+  .cta-link {
+    font-size: 0.9rem;
+  }
+
+  .dropdown-content {
+    min-width: 260px;
+    padding: 20px;
+  }
+
+  .sucursal-item {
+    font-size: 0.85rem;
+  }
+}
+
+/* 4. DESKTOP ESTÁNDAR (992px+) */
+@media (min-width: 62em) {
+  .grid-container {
+    gap: var(--space-xl);
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .horarios-container {
+    max-width: 600px;
+  }
+}
+
+/* 5. LARGE DESKTOP (1200px+) */
+@media (min-width: 75em) {
+  .contact-bar-container {
+    margin: var(--space-2xl) 0;
+  }
+
+  .grid-container {
+    margin: var(--space-2xl) auto;
+    grid-template-columns: repeat(
+      5,
+      1fr
+    ); /* 5 columnas para mejor balance visual */
+  }
+}
+
+/* 6. EXTRA LARGE (1408px+) */
+@media (min-width: 88em) {
+  .container {
+    max-width: 1800px;
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(
+      6,
+      1fr
+    ); /* 6 columnas en pantallas gigantes */
+    max-width: 1700px;
+  }
+} /* ==========================================
+    18. ACCESIBILIDAD Y PERFORMANCE - FIX
+    ========================================== */
+
+/* Ajustes específicos para móviles (Mobile First / Responsive) */
+@media (max-width: 37.5em) {
+  /* Forzamos que el dropdown NO flote para que no tape el banner */
+  .dropdown-content {
+    position: relative; /* Cambiado de fixed/absolute a relative */
+    width: 100%;
+    max-width: 100%;
+    left: 0;
+    transform: none;
+    bottom: auto; /* Eliminamos el bottom: 20px que lo fijaba abajo */
+    display: none; /* Se activa con la clase .active desde JS */
+    box-shadow: none;
+    background: rgba(
+      255,
+      255,
+      255,
+      0.03
+    ); /* Fondo sutil para diferenciar la lista */
+    border: none;
+    margin-top: 10px;
+    padding: 5px;
+  }
+
+  /* Si la lista es muy larga (Comayagua), permitimos scroll interno sutil */
+  .nav-item.active .dropdown-content {
+    display: block;
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  /* Animación para el icono del chevron al abrir */
+  .nav-item.active .mini-icon {
+    transform: rotate(180deg);
+    color: var(--primary-light);
+  }
+
+  /* Aseguramos que el cuerpo no tenga scroll horizontal */
+  body,
+  html {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
+}
+
+/* --- ESTILOS DE ELEMENTOS DE SUCURSAL --- */
+
+.sucursal-header {
+  padding: 12px 15px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: 1px solid rgba(0, 161, 228, 0.1);
+  margin-bottom: 5px;
+}
+
+.sucursal-item-simple {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  color: var(--txt);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.sucursal-item-simple:last-child {
+  border-bottom: none;
+}
+
+.sucursal-item-simple i {
+  color: var(--primary);
+  font-size: 1rem;
+  flex-shrink: 0; /* Evita que el icono se aplaste */
+}
+
+.sucursal-item-simple span {
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.sucursal-item-simple span strong {
+  color: var(--primary-light);
+  display: block; /* El nombre de la sucursal arriba, la dirección abajo */
+}
+
+/* Efecto hover solo para PC o cuando se interactúa */
+@media (min-width: 37.5em) {
+  .sucursal-item-simple:hover {
+    background: rgba(0, 161, 228, 0.1);
+    transform: translateX(8px);
+    color: var(--primary-light);
+  }
+}

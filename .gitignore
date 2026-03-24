@@ -1,0 +1,25 @@
+# Python (Basura que genera al ejecutar scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+env/
+
+# Configuración de Editores (Opcional)
+.vscode/
+.history/
+.DS_Store
+
+# Ignorar backups locales
+tool/backups/
+# Ignorar archivos de Python
+__pycache__/
+*.pyc
+# Ignorar carpetas de sistema
+.DS_Store
+
+echo "node_modules/" > .gitignore
+echo ".DS_Store" >> .gitignore
+echo ".firebase/" >> .gitignore
